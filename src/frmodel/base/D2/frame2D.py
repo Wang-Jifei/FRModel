@@ -177,7 +177,7 @@ class Frame2D:
     def width(self):
         return self.data.shape[1]
 
-    def channel(self, channel: CONSTS.CHANNEL) -> Channel2D:
+    def channel(self, channel: CONSTS.CHANNEL = "R") -> Channel2D:
         """ Gets the red channel of the Frame """
         return Channel2D(self.data[channel]
                              .reshape(self.shape[0:2]))
