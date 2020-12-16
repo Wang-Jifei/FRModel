@@ -1,5 +1,5 @@
 import unittest
-
+import logging
 
 from frmodel.base.D2.frame2D import Frame2D
 from frmodel.base.consts import CONSTS
@@ -33,7 +33,11 @@ class FrameTest(TestD2):
 
         # Hence the number of rows (index 0) must be equal to window size
         self.assertEqual(self.window, frames[0].shape[0])
-
+    
+    def runTest(self):
+        log= logging.getLogger("TestD2.setUp")
+        log.debug(f"original frame shape: {self.frame.shape}, len(frame_window): {len(self.frame.split_xy(100))}, len(frame_window[0]: {len(self.frame.split_xy(100)[0])}, shape of one Frame2D: {self.frame_window.shape} ({type(self.frame_window)})")
+        self.assertEqual(1,1)
 
 if __name__ == '__main__':
     unittest.main()

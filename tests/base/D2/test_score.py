@@ -17,7 +17,7 @@ class ScoreTest(TestD2):
 
         km = frame_xy.kmeans(KMeans(n_clusters=3, verbose=False),
                              fit_indexes=[2, 3, 4, 5, 6, 7],
-                             scaler=minmax_scale)
+                             scaler=minmax_scale) # TODO: must implement normalization before using kanungo package
 
         self.assertAlmostEqual(km.score(self._RSC + "/imgs/basic/box.png")[1], 1)
 
