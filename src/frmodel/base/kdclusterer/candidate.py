@@ -5,9 +5,11 @@ class Candidate:
     """
     def __init__(self, dimensions = None, initial_pos = None):
         """
-        :param initial_pos: A specific point at which to initialize the candidate center, if any. 
+        :param initial_pos: np.ndarray of a specific point at which to initialize the candidate center, if any. 
         :param dimensions: The number of dimensions in each point [R,G,B,X,Y,H,S,V,...]
         Either initial_pos or dimensions must be specified during initialization.  
+        
+        candidate.wgt_cent is the np.ndarray of the vector sum of all the points assigned to the candidate so far.
         """
         if initial_pos is not None:
             self.wgt_cent = initial_pos
@@ -29,52 +31,48 @@ class Candidate:
     @property
     # This must be a property because wgt_cent and count are updated gradually
     def candidate_pos(self):
+       
         return self.wgt_cent / self.count
 
-    def is_farther(self, other_cand, cell):
+    def is_farther(self, other_cand, cmin, cmax):
         """Check whether this candidate is further from the actual centroid of the cell than is the other candidate other_cand.
         :param other_cand: Candidate
-        :param cell: iterator
+        # :param cell: iterator over all nodes within the cell of the node that called filter().
+        :param cmin: np.ndarray of the minimum value of the cell in each dimension
+        :param cmax: np.ndarray of the maximum value of the cell in each dimension
 
         PROCESS:
 
         Calculate the vector z-z*, as required in Fig 2
         Let H be the bisecting hyperplane of vec.
-        Find the minimum and maximum value of the cell in each dimension
-        i.e. calculate [Cmin_i, Cmax_i] for each dimension i
-        so that we can find the vertex v(H) of the cell, that is EXTREME IN THE DIRECTION OF VEC.
-        This means that the k-dimensional position of v(H) has values that are 
+        Find the vertex v(H) of the cell, that is EXTREME IN THE DIRECTION OF VEC.
+        "Extreme" means that the k-dimensional position of v(H) has values that are 
         the highest in the direction of positive vec, compared to other vertices.
+        "We take the ith coordinate of v(H) to be cmin[i] if the ith coordinate of u is negative and cmax[i] otherwise."
         z is pruned if and only if dist(z,v(H))≥dist(z*, v(H))
         because this would mean that the cell lies entirely to one side of the bisecting hyperplane H of vec.
         """
-        if self == other_cand:
-            return False
-        
+     
         # Calculating the vector z-z*, as required in Fig 2
         vec = self.candidate_pos - other_cand.candidate_pos
+        print("\ncandidate pos ", self.candidate_pos)
+        print("vec", vec)
         
-        # Initializing the minimum and maximum values of the cell in each dimension
-        cmin = next(cell).data.tolist()
-        cmax = cmin.copy()
-
-        # Get the actual minimum and maximum coordinate of the cell so as to find the extreme vertex v(H)
-        for kd_node in cell:
-            for idx, val in enumerate(kd_node.data): # TODO: optimize
-                cmin[idx] = min(cmin[idx], val) 
-                cmax[idx] = max(cmax[idx], val)
-
         # Find the extreme vertex v(H)
-        # "We take the ith coordinate of v(H) to be Cmin[i] if the ith coordinate of u is negative and Cmax[i] otherwise."
-        vH = np.array([])
-        for idx, vec_val in vec:
+        vH = np.zeros(shape = vec.shape)
+
+        for idx, vec_val in np.ndenumerate(vec):
             if vec_val < 0:
-                np.append(vH, cmin[idx])
+                vH[idx] = cmin[idx]
             else:
-                np.append(vH, cmax[idx])
-        
-        # z is pruned if and only if dist(z,v(H)) >= dist(z_star, v(H)), squared distance may be used to avoid squaroot
-        dist1 = np.linalg.norm(self.candidate_pos, vH) # Euclidean distance
-        dist2 = np.linalg.norm(other_cand.candidate_pos, vH)
+                vH[idx] = cmax[idx]
+
+        print("Extreme vertex vH is ", vH)
+        # z is pruned if and only if dist(z,v(H)) >= dist(z_star, v(H)), squared distance may be used to avoid square root
+        dist1 = np.linalg.norm(self.candidate_pos-vH) # Euclidean distance
+        print("dist1 ", dist1)
+
+        dist2 = np.linalg.norm(other_cand.candidate_pos-vH) # other_cand is z_star
+        print("dist2", dist2)
         return dist1 >= dist2
 

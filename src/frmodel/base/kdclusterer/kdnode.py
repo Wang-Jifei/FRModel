@@ -1,10 +1,10 @@
 import numpy as np
 from itertools import chain
-from kanungo_utils import *
-from candidate import Candidate
+from frmodel.base.kdclusterer import kanungo_utils
+from frmodel.base.kdclusterer.candidate import Candidate
 
 class KDNode:
-    def __init__(self, data, left=None, right=None, axis=None):
+    def __init__(self, data, left=None, right=None, axis=0):
         """ Creates a new node in the kd-tree, with implementation of the filtering algorithm,
         whereby candidate centers for each node are pruned, or "filtered",
         as they are propagated to the node's children.
@@ -23,18 +23,20 @@ class KDNode:
         self.dimensions = len(self.data.shape)
 
         self.count = 1 # u.count in the paper, the number of points in the cell 
-        self.wgt_cent = self.data # u.wgtCent in the paper, the vector sum of all points in the cell
-        
-        if left is not None and left.data is not None:
+        self.wgt_cent = np.array(data, copy = True) # u.wgtCent in the paper, the vector sum of all points in the cell
+        # NOT self.wgt_cent = data because otherwise any updates to wgt_cent will cause self.data to change as well
+
+        if left is not None:
             self.count += left.count
             self.wgt_cent += left.wgt_cent
-        if right is not None and right.data is not None:
+        if right is not None:
             self.count += right.count
             self.wgt_cent += right.wgt_cent
         
         self.actual_cent = self.wgt_cent / self.count # the actual centroid in the paper
 
         self.candidate_centers = []
+        self.assigned = None
 
     def is_leaf(self):
         return self.count ==1
@@ -63,9 +65,9 @@ class KDNode:
         iterator = me()
 
         if self.right:
-            iterator = chain(self.right.cell, iterator)
+            iterator = chain(iterator, self.right.cell)#, iterator
         if self.left:
-            iterator = chain(self.left.cell, iterator)
+            iterator = chain(iterator, self.left.cell) #, iterator
 
         return iterator
    
@@ -96,19 +98,27 @@ class KDNode:
         
         :param candidate_centers_set: Set of Candidates that we can choose from (inherited from the parent node)
         
-        TODO: How do we assign the nodes with more than one candidate center to a cluster?
+        
         TODO: Implement density-based cluster seeding to generate the candidate_centers_set.
         """
-
-        z_star = get_closest_candidate(candidate_centers_set, self.actual_cent)
+        print("self.data: ", self.data)
+        z_star = kanungo_utils.get_closest_candidate(candidate_centers_set, self.actual_cent)
+        print("z_star.candidate_pos: ", z_star.candidate_pos)
         if self.is_leaf():
             # self.assign(z_star)
-            new_candidate_centers_set = set(z_star)
+            new_candidate_centers_set = set([z_star])
         else:
-            new_candidate_centers_set = candidate_centers_set.copy()
-            for z in candidate_centers_set.copy().discard(z_star):
-                if z.is_farther(z_star, self.cell):
+            new_candidate_centers_set = candidate_centers_set.copy() 
+            # must .copy() because we use filter() for left child branch, then for right child branch. Do not want left child filter to affect right child filter
+            # Python is a PASS-BY-OBJECT-REFERENCE programming language 
+            temp = candidate_centers_set.copy()
+            temp.discard(z_star)
+            cmin, cmax = kanungo_utils.get_minmax(self)
+            
+            for z in temp:
+                if z.is_farther(z_star, cmin, cmax):
                     new_candidate_centers_set.discard(z)
+                    print(f"Pruned {z.candidate_pos}")
             
         if len(new_candidate_centers_set) == 1:
             z_star.addtree(self) # update the position of z_star
@@ -118,11 +128,16 @@ class KDNode:
         else:
             self.candidate_centers = new_candidate_centers_set
             if self.left:
-                self.left.filter(new_candidate_centers_set)
+                print(f"\nAt left of {self.data} now\n")
+                self.left.filter(new_candidate_centers_set) 
             if self.right:
+                print(f"\nAt right of {self.data} now\n")
                 self.right.filter(new_candidate_centers_set)
+
+            # TODO: ADD THE ASSIGNMENT OF THE PARENT NODES HERE
+            self.assigned = z_star # help idk
         
-# if __name__ == "__main__":
+
     
 
 
