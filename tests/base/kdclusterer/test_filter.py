@@ -8,12 +8,13 @@ from tests.base.D2.test_d2 import TestD2
 import unittest
 import numpy as np
 import sys
+from PIL import Image
 
 class TestFilter(TestKUtils, TestD2, unittest.TestCase):
     def test_filter(self):
         log = logging.getLogger("TestFilter.test_filter")
      
-        k = 5
+        k = 3
         candidate_centers_set = set()
         mapping_dict = {}
         for i in range(1, k+1):
@@ -30,13 +31,11 @@ class TestFilter(TestKUtils, TestD2, unittest.TestCase):
         log.debug(f"root.right.assigned: {self.root.right.assigned}")
         log.debug(f"root.left.assigned: {self.root.left.assigned}")
         log.debug(f"root.left.left.assigned: {self.root.left.left.assigned}")
-
         
-        # make_plot(self.root, self.frame2.width(), self.frame2.height(), mapping_dict)
+        make_plot(self.root, self.frame_window.width(), self.frame_window.height(), mapping_dict)
 
-        # For quick testing
-        make_plot(self.root, 100, 100, mapping_dict)
-        self.assertEqual(1,1)
+        # img = Image.fromarray(self.frame_window.data, 'RGB')
+        # img.show()
 
 if __name__ == "__main__":
     logging.basicConfig(stream = sys.stderr)

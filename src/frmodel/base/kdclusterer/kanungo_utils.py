@@ -84,11 +84,12 @@ def make_plot(root, width, height, mapping_dict):
    
     all_x = np.arange(width)
     all_x = np.tile(all_x,height)
-    all_y = np.arange(height)[np.newaxis, :].transpose()
+    all_y = np.arange(height-1, stop = -1, step = -1)[np.newaxis, :].transpose()
     all_y = np.tile(all_y, (1,width)).flatten()
-
+    print(all_y)
     fig, ax = plt.subplots()
     ax.scatter(all_x, all_y, c = all_assigned,  alpha = 0.5)
+  
     ax.set_aspect("equal")
     plt.show()
 

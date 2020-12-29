@@ -10,20 +10,22 @@ import numpy as np
 
 class TestKUtils(TestD2, unittest.TestCase):
 
-    # def setUp(self): 
-    #     super(TestD2, self).setUp()
-    #     self.flatdata = self.frame2.data_flatten()
-    #     self.root = construct_kdtree(self.flatdata)
+    def setUp(self): 
+        super(TestD2, self).setUp()
+        self.frame_window = self.frame.split_xy(100)[0][0]
+        self.flatdata = self.frame_window.get_chns(xy=True, hsv=True, mex_g=True, ex_gr=True, ndi=True).data_flatten()
+        self.root = construct_kdtree(self.flatdata)
 
-    # FOR TESTING QUICKLY
-    def setUp(cls): # setUp, not setUpClass, otherwise each child instance will have different data
-        cls.num_points = 100*100
-        cls.num_channels = 2
-        cls.flatdata = np.random.random(size=(cls.num_points, cls.num_channels)) # assume minmax scaling of frame.data
-        cls.root = construct_kdtree(cls.flatdata)
+    # # FOR TESTING QUICKLY
+    # def setUp(cls): # setUp, not setUpClass, otherwise each child instance will have different data
+    #     cls.num_points = 100*100
+    #     cls.num_channels = 2
+    #     cls.flatdata = np.random.random(size=(cls.num_points, cls.num_channels)) # assume minmax scaling of frame.data
+    #     cls.root = construct_kdtree(cls.flatdata)
    
     def test_kutils(self):
         log = logging.getLogger("TestKUtils.setUp")
+        log.debug(f"frame_window.data.shape: {self.frame_window.data.shape}")
         log.debug(f"flat data shape: {self.flatdata.shape}")
         log.debug(f"flat data: {self.flatdata}")
         
