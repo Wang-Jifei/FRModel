@@ -69,29 +69,29 @@ def construct_kdtree(point_arr, axis = 0, leaf_size=1):
 
     return kdnode.KDNode(median_point, left, right, axis = axis)
 
-def make_plot(root, width, height, mapping_dict):
-    #https://stackoverflow.com/questions/62362807/plotting-multi-class-semantic-segmentation-transparent-overlays-over-rgb-image
-    """Allows us to see what clusters have been generated
-    :param root: The root node of the kd tree.
-    Note that this should only be run after running root.filter(candidate_centers_set)
-    """
+# def make_plot(root, width, height, mapping_dict):
+#     #https://stackoverflow.com/questions/62362807/plotting-multi-class-semantic-segmentation-transparent-overlays-over-rgb-image
+#     """Allows us to see what clusters have been generated
+#     :param root: The root node of the kd tree.
+#     Note that this should only be run after running root.filter(candidate_centers_set)
+#     """
     
-    all_assigned = [n.assigned for n in root.cell]
-    def cand_to_int(mapping_dict, cand):
-        return mapping_dict[cand]
+#     all_assigned = [n.assigned for n in root.cell]
+#     def cand_to_int(mapping_dict, cand):
+#         return mapping_dict[cand]
 
-    all_assigned = [cand_to_int(mapping_dict, c) for c in all_assigned]
+#     all_assigned = [cand_to_int(mapping_dict, c) for c in all_assigned]
    
-    all_x = np.arange(width)
-    all_x = np.tile(all_x,height)
-    all_y = np.arange(height-1, stop = -1, step = -1)[np.newaxis, :].transpose()
-    all_y = np.tile(all_y, (1,width)).flatten()
-    print(all_y)
-    fig, ax = plt.subplots()
-    ax.scatter(all_x, all_y, c = all_assigned,  alpha = 0.5)
+#     all_x = np.arange(width)
+#     all_x = np.tile(all_x,height)
+#     all_y = np.arange(height-1, stop = -1, step = -1)[np.newaxis, :].transpose()
+#     all_y = np.tile(all_y, (1,width)).flatten()
+#     print(all_y)
+#     fig, ax = plt.subplots()
+#     ax.scatter(all_x, all_y, c = all_assigned,  alpha = 0.5)
   
-    ax.set_aspect("equal")
-    plt.show()
+#     ax.set_aspect("equal")
+#     plt.show()
 
 def get_minmax(kd_node):
     """Find the minimum and maximum value of the cell whose root is `kd_node`
