@@ -34,8 +34,6 @@ class TestFilter(TestKUtils, TestD2, unittest.TestCase):
         
         make_plot(self.root, self.frame_window.width(), self.frame_window.height(), mapping_dict)
 
-        # img = Image.fromarray(self.frame_window.data, 'RGB')
-        # img.show()
 
 if __name__ == "__main__":
     logging.basicConfig(stream = sys.stderr)
