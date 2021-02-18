@@ -16,25 +16,31 @@ def get_closest_candidate(candidate_centers_set, actual_cent):
     zstar = None 
     for cand in candidate_centers_set:
         dist = np.linalg.norm(cand.candidate_pos - actual_cent)
+        print("minused: ", cand.candidate_pos - actual_cent)
+        print("cand pos: ", cand.candidate_pos)
+        print("actual_cent: ", actual_cent)
+        print("dist is ", dist)
         if dist < min_dist:
             min_dist = dist
             zstar = cand
     return zstar
 
-def child_axis_calculator(parent_axis, dimensions):
+def child_axis_calculator(parent_axis, axes_to_pick_from):
     """Determines the next axis to split the cell by, by just taking turns. 
     
     :param parent_axis: The most recent axis that the cell has been split by
-    :param dimensions: The number of dimensions in each point (due to get_chns())
+    :param axes_to_pick_from: List of axis indices to pick from in turn sequence (starting from 0) 
    
     TODO: Implement sliding midpoint rule, in which case the 
     child_axis_calculator must return the longest axis of the cell, not just taking turns for each axis
     """
-    return (parent_axis+1)%dimensions
+    current_idx = axes_to_pick_from.index(parent_axis)
+    next_idx = (current_idx+1)%len(axes_to_pick_from)
+    return axes_to_pick_from[next_idx]
 
-def construct_kdtree(point_arr, axis = 0, leaf_size=1, child = None):
+def construct_kdtree(point_arr, axis, x_pos=0, y_pos=1, leaf_size=1, child = None):
     """Creates a kd tree from an array of points.
-    :param point_arr: Flattened image array of points
+    :param point_arr: Flattened image array of points, where each point is in the format of e.g. [xyrgb]
     :param axis: Axis to split the cell by
     
     Note regarding point_arr: For a 2D image, the frame data would be a 3D array of shape (height, width, num_channels)
@@ -45,6 +51,7 @@ def construct_kdtree(point_arr, axis = 0, leaf_size=1, child = None):
     Given the specified axis to split the cell by, we find the median value of the cell in this axis.
     A new node will be created, using the point that has the median value. 
     The LHS and RHS children of this node are constructed post-order recursively.
+    THE X AND Y COORDINATES OF THE POINTS ARE NOT USED FOR SPLITTING. 
 
     # TODO: Instead of median, the sliding midpoint rule takes midpoint, while also ensuring not all points lie to one side
     See here for illustration: https://www.researchgate.net/figure/The-Sliding-Midpoint-rule-avoids-trivial-splits-2_fig3_251492991
@@ -57,22 +64,24 @@ def construct_kdtree(point_arr, axis = 0, leaf_size=1, child = None):
     # Find the point that has the median value in the specified splitting axis
     median_idx = point_arr.shape[0] // 2
     partial_sort_idx = np.argpartition(point_arr[:, axis], median_idx)
-    median_point = point_arr[partial_sort_idx][median_idx,:]
+    median_point = point_arr[partial_sort_idx][median_idx,:] # xyrgb point
     # print(f"median point: {median_point}")
     partial_sorted_point_arr = point_arr[partial_sort_idx]
 
     # Recursively create the child nodes
-    dimensions = point_arr.shape[1]
-    next_axis = child_axis_calculator(axis, dimensions)
-    left = construct_kdtree(partial_sorted_point_arr[:median_idx], next_axis) 
+    dimensions = point_arr.shape[-1]
+    axes_to_pick_from = [i for i in range(dimensions) if i not in [x_pos, y_pos]]
+    next_axis = child_axis_calculator(axis, axes_to_pick_from) # if there are 3 dimensions (rgb), next_axis is 0, 1 or 2
+    left = construct_kdtree(partial_sorted_point_arr[:median_idx], axis = next_axis, x_pos = x_pos, y_pos = y_pos)
     # TODO: if there is more than one node with the same value in that splitting axis, 
     # then the node at the median_idx will be different each time -->
     # which means that kd trees are not unique, if the value of the nodes (at each different splitting axis) is not unique (?).
     # Is it possible to reconstruct the image from the kd tree if the kd tree is different each time?
+    #  --> i think must we record the actual ax and y coords of each kd node of the kd tree
 
-    right = construct_kdtree(partial_sorted_point_arr[median_idx+1:], next_axis)
+    right = construct_kdtree(partial_sorted_point_arr[median_idx+1:], axis = next_axis, x_pos = x_pos, y_pos = y_pos)
 
-    newnode = kdnode.KDNode(median_point, left, right, axis = axis)
+    newnode = kdnode.KDNode(median_point, x_pos = x_pos, y_pos = y_pos, left = left, right = right, axis = axis)
     if left:
         newnode.left.parent = newnode
         newnode.left.child = "left"

@@ -4,19 +4,27 @@ from frmodel.base.kdclusterer import kanungo_utils
 from frmodel.base.kdclusterer.candidate import Candidate
 
 class KDNode:
-    def __init__(self, data, left=None, right=None, axis=0, child = None, parent = None):
+    def __init__(self, point, x_pos = 0, y_pos=1, left=None, right=None, axis=0, child = None, parent = None):
         """ Creates a new node in the kd-tree, with implementation of the filtering algorithm,
         whereby candidate centers for each node are pruned, or "filtered",
         as they are propagated to the node's children.
 
-        :param data: np.ndarray # One point [R,G,B,X,Y,H,S,V,EX_G, ...] as defined in _frame_channel.py
+        :param point: np.ndarray # One point [X,Y,R,G,B,H,S,V,EX_G, ...] as defined in _frame_channel.py
+        :param x_pos: integer position (starting from 0) of the x-coordinate of the point in the image
         :param left: KDNode
         :param right: KDNode
         :param axis: int # axis of splitting the kd space
         :param child: "left" or "right", i.e. whether the root node of this kd subtree is the left of right child of the parent node. None if the node is the root node
         """
        
-        self.data = data
+        self.x = point[x_pos]
+        self.y = point[y_pos]
+        temp = []
+        for i in range(point.shape[0]):
+            if i not in [x_pos, y_pos]:
+                temp.append(i)
+        self.data = point[temp]
+
         self.left = left
         self.right = right
         self.axis = axis
@@ -25,7 +33,7 @@ class KDNode:
         self.dimensions = len(self.data.shape)
 
         self.count = 1 # u.count in the paper, the number of points in the cell whose root is this KDNode
-        self.wgt_cent = np.array(data, copy = True) # u.wgtCent in the paper, the vector sum of all points in the cell
+        self.wgt_cent = np.array(self.data, copy = True) # u.wgtCent in the paper, the vector sum of all points in the cell
         # NOT self.wgt_cent = data because otherwise any updates to wgt_cent will cause self.data to change as well
 
         if left is not None:

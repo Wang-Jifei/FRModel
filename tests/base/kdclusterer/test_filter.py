@@ -32,9 +32,7 @@ class TestFilter(TestKUtils, TestD2, unittest.TestCase):
         log.debug(f"root.left.assigned: {self.root.left.assigned}")
         log.debug(f"root.left.left.assigned: {self.root.left.left.assigned}")
         
-        make_plot(self.root, self.frame_window.width(), self.frame_window.height(), mapping_dict)
-
-
+       
 if __name__ == "__main__":
     logging.basicConfig(stream = sys.stderr)
     logging.getLogger("TestFilter.test_filter").setLevel(logging.DEBUG)

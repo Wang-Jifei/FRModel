@@ -6,7 +6,8 @@ class Candidate:
     def __init__(self, dimensions = None, initial_pos = None):
         """
         :param initial_pos: np.ndarray of a specific point at which to initialize the candidate center, if any. 
-        :param dimensions: The number of dimensions in each point [R,G,B,X,Y,H,S,V,...]
+        NOTE THAT THE POINT MUST EXCLUDE X AND Y, e.g. if the tif data has points of the form [xyrgb], then each Candidate point should be initialized with only [rgb]
+        :param dimensions: The number of dimensions in each point [R,G,B,H,S,V,...] (X AND Y SHOULD NOT BE DIMENSIONS OF THE CANDIDATE)
         Either initial_pos or dimensions must be specified during initialization.  
         
         candidate.wgt_cent is the np.ndarray of the vector sum of all the points assigned to the candidate so far.

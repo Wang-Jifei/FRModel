@@ -286,11 +286,11 @@ body.cython { font-family: courier; font-size: 12; }
 .cython.score-252 {background-color: #FFFF09;}
 .cython.score-253 {background-color: #FFFF09;}
 .cython.score-254 {background-color: #FFFF09;}
-pre { line-height: 125%; margin: 0; }
-td.linenos pre { color: #000000; background-color: #f0f0f0; padding: 0 5px 0 5px; }
-span.linenos { color: #000000; background-color: #f0f0f0; padding: 0 5px 0 5px; }
-td.linenos pre.special { color: #000000; background-color: #ffffc0; padding: 0 5px 0 5px; }
-span.linenos.special { color: #000000; background-color: #ffffc0; padding: 0 5px 0 5px; }
+pre { line-height: 125%; }
+td.linenos pre { color: #000000; background-color: #f0f0f0; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #000000; background-color: #f0f0f0; padding-left: 5px; padding-right: 5px; }
+td.linenos pre.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
 .cython .hll { background-color: #ffffcc }
 .cython { background: #f8f8f8; }
 .cython .c { color: #408080; font-style: italic } /* Comment */
@@ -546,15 +546,15 @@ static PyObject *__pyx_pf_3src_7frmodel_4base_2D2_5frame_8_cy_glcm_cy_glcm(CYTHO
   return __pyx_r;
 }
 /* … */
-  __pyx_tuple__24 = <span class='py_c_api'>PyTuple_Pack</span>(17, __pyx_n_s_c, __pyx_n_s_radius, __pyx_n_s_verbose, __pyx_n_s_c_view, __pyx_n_s_w_size, __pyx_n_s_wi_rows, __pyx_n_s_wi_cols, __pyx_n_s_wi_r, __pyx_n_s_wi_c, __pyx_n_s_w_rows, __pyx_n_s_w_cols, __pyx_n_s_w_r, __pyx_n_s_w_c, __pyx_n_s_w_channels, __pyx_n_s_w_ch, __pyx_n_s_glcm_v, __pyx_n_s_glcm_v_view);<span class='error_goto'> if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 12, __pyx_L1_error)</span>
-  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_tuple__24);
-  <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_tuple__24);
+  __pyx_tuple__21 = <span class='py_c_api'>PyTuple_Pack</span>(17, __pyx_n_s_c, __pyx_n_s_radius, __pyx_n_s_verbose, __pyx_n_s_c_view, __pyx_n_s_w_size, __pyx_n_s_wi_rows, __pyx_n_s_wi_cols, __pyx_n_s_wi_r, __pyx_n_s_wi_c, __pyx_n_s_w_rows, __pyx_n_s_w_cols, __pyx_n_s_w_r, __pyx_n_s_w_c, __pyx_n_s_w_channels, __pyx_n_s_w_ch, __pyx_n_s_glcm_v, __pyx_n_s_glcm_v_view);<span class='error_goto'> if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 12, __pyx_L1_error)</span>
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_tuple__21);
+  <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_tuple__21);
 /* … */
   __pyx_t_2 = PyCFunction_NewEx(&amp;__pyx_mdef_3src_7frmodel_4base_2D2_5frame_8_cy_glcm_1cy_glcm, NULL, __pyx_n_s_src_frmodel_base_D2_frame__cy_gl_2);<span class='error_goto'> if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 12, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
   if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_cy_glcm, __pyx_t_2) &lt; 0) <span class='error_goto'>__PYX_ERR(0, 12, __pyx_L1_error)</span>
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_codeobj__25 = (PyObject*)<span class='pyx_c_api'>__Pyx_PyCode_New</span>(3, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_frmodel_base_D2_frame__cy_gl, __pyx_n_s_cy_glcm, 12, __pyx_empty_bytes);<span class='error_goto'> if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 12, __pyx_L1_error)</span>
+  __pyx_codeobj__22 = (PyObject*)<span class='pyx_c_api'>__Pyx_PyCode_New</span>(3, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_frmodel_base_D2_frame__cy_gl, __pyx_n_s_cy_glcm, 12, __pyx_empty_bytes);<span class='error_goto'> if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 12, __pyx_L1_error)</span>
 </pre><pre class="cython line score-0">&#xA0;<span class="">13</span>:                <span class="nb">unsigned</span> <span class="nb">int</span> <span class="n">radius</span><span class="p">,</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">14</span>:                <span class="n">bint</span> <span class="n">verbose</span><span class="p">):</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">15</span>:     <span class="sd">&quot;&quot;&quot; GLCM Calculation in Cython. (Deprecated for FRModel)</span></pre>
