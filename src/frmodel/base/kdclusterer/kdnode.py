@@ -4,7 +4,7 @@ from frmodel.base.kdclusterer import kanungo_utils
 from frmodel.base.kdclusterer.candidate import Candidate
 
 class KDNode:
-    def __init__(self, data, left=None, right=None, axis=0):
+    def __init__(self, data, left=None, right=None, axis=0, child = None, parent = None):
         """ Creates a new node in the kd-tree, with implementation of the filtering algorithm,
         whereby candidate centers for each node are pruned, or "filtered",
         as they are propagated to the node's children.
@@ -13,16 +13,18 @@ class KDNode:
         :param left: KDNode
         :param right: KDNode
         :param axis: int # axis of splitting the kd space
-          
+        :param child: "left" or "right", i.e. whether the root node of this kd subtree is the left of right child of the parent node. None if the node is the root node
         """
        
         self.data = data
         self.left = left
         self.right = right
         self.axis = axis
+        self.child = child
+        self.parent = parent
         self.dimensions = len(self.data.shape)
 
-        self.count = 1 # u.count in the paper, the number of points in the cell 
+        self.count = 1 # u.count in the paper, the number of points in the cell whose root is this KDNode
         self.wgt_cent = np.array(data, copy = True) # u.wgtCent in the paper, the vector sum of all points in the cell
         # NOT self.wgt_cent = data because otherwise any updates to wgt_cent will cause self.data to change as well
 
@@ -33,7 +35,7 @@ class KDNode:
             self.count += right.count
             self.wgt_cent += right.wgt_cent
         
-        self.actual_cent = self.wgt_cent / self.count # the actual centroid in the paper
+        self.actual_cent = self.wgt_cent / self.count # the actual centroid of the cell whose root is this KDnode
 
         self.candidate_centers = []
         self.assigned = None
@@ -62,13 +64,20 @@ class KDNode:
         def me():
             yield self
 
-        iterator = me()
+        # iterator = me() # can do in-order???
 
-        if self.right:
-            iterator = chain(iterator, self.right.cell)#, iterator
+        # if self.right:
+        #     iterator = chain(iterator, self.right.cell)#, iterator
+        # if self.left:
+        #     iterator = chain(iterator, self.left.cell) #, iterator
+
         if self.left:
-            iterator = chain(iterator, self.left.cell) #, iterator
-
+            iterator = chain(self.left.cell, me())
+        else:
+            iterator = me()
+        if self.right:
+            iterator = chain(iterator, self.right.cell)
+        
         return iterator
    
     def height(self):
@@ -110,7 +119,7 @@ class KDNode:
         else:
             new_candidate_centers_set = candidate_centers_set.copy() 
             # must .copy() because we use filter() for left child branch, then for right child branch. Do not want left child filter to affect right child filter
-            # Python is a PASS-BY-OBJECT-REFERENCE programming language 
+            # Python is a PASS-BY-ASSIGNMENT programming language 
             temp = candidate_centers_set.copy()
             temp.discard(z_star)
             cmin, cmax = kanungo_utils.get_minmax(self)
@@ -134,8 +143,8 @@ class KDNode:
                 print(f"\nAt right of {self.data} now\n")
                 self.right.filter(new_candidate_centers_set)
 
-            # TODO: ADD THE ASSIGNMENT OF THE PARENT NODES HERE
-            self.assigned = z_star # help idk
+            #  ADD THE ASSIGNMENT OF THE PARENT NODES HERE
+            self.assigned = z_star # TODO: help idk
         
 
     

@@ -32,19 +32,19 @@ def child_axis_calculator(parent_axis, dimensions):
     """
     return (parent_axis+1)%dimensions
 
-def construct_kdtree(point_arr, axis = 0, leaf_size=1):
+def construct_kdtree(point_arr, axis = 0, leaf_size=1, child = None):
     """Creates a kd tree from an array of points.
     :param point_arr: Flattened image array of points
     :param axis: Axis to split the cell by
-
+    
     Note regarding point_arr: For a 2D image, the frame data would be a 3D array of shape (height, width, num_channels)
     where num_channels is obtained by calling frame.get_chns(). Before a kd tree can be constructed, 
-    flatten the image to 2D array of shape (heigth * width, num_channels), using frame.data_flatten().  
+    flatten the image to 2D array of shape (height * width, num_channels), using frame.data_flatten().  
     Then call construct_kdtree().
 
     Given the specified axis to split the cell by, we find the median value of the cell in this axis.
     A new node will be created, using the point that has the median value. 
-    The LHS and RHS children of this node are constructed pre-order recursively.
+    The LHS and RHS children of this node are constructed post-order recursively.
 
     # TODO: Instead of median, the sliding midpoint rule takes midpoint, while also ensuring not all points lie to one side
     See here for illustration: https://www.researchgate.net/figure/The-Sliding-Midpoint-rule-avoids-trivial-splits-2_fig3_251492991
@@ -64,10 +64,24 @@ def construct_kdtree(point_arr, axis = 0, leaf_size=1):
     # Recursively create the child nodes
     dimensions = point_arr.shape[1]
     next_axis = child_axis_calculator(axis, dimensions)
-    left = construct_kdtree(partial_sorted_point_arr[:median_idx], next_axis)
+    left = construct_kdtree(partial_sorted_point_arr[:median_idx], next_axis) 
+    # TODO: if there is more than one node with the same value in that splitting axis, 
+    # then the node at the median_idx will be different each time -->
+    # which means that kd trees are not unique, if the value of the nodes (at each different splitting axis) is not unique (?).
+    # Is it possible to reconstruct the image from the kd tree if the kd tree is different each time?
+
     right = construct_kdtree(partial_sorted_point_arr[median_idx+1:], next_axis)
 
-    return kdnode.KDNode(median_point, left, right, axis = axis)
+    newnode = kdnode.KDNode(median_point, left, right, axis = axis)
+    if left:
+        newnode.left.parent = newnode
+        newnode.left.child = "left"
+    if right:
+        newnode.right.parent = newnode
+        newnode.right.child = "right"
+
+    return newnode
+
 
 # def make_plot(root, width, height, mapping_dict):
 #     #https://stackoverflow.com/questions/62362807/plotting-multi-class-semantic-segmentation-transparent-overlays-over-rgb-image
@@ -106,6 +120,7 @@ def get_minmax(kd_node):
     
     # Get the actual minimum and maximum coordinate of the cell 
     for n in kd_node.cell:
+
         for idx, val in np.ndenumerate(n.data): # TODO: optimize
             if val < cmin[idx]:
                 cmin[idx] = val

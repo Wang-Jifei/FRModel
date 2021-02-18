@@ -13,7 +13,7 @@ from PIL import Image
 class TestFilter(TestKUtils, TestD2, unittest.TestCase):
     def test_filter(self):
         log = logging.getLogger("TestFilter.test_filter")
-     
+    
         k = 3
         candidate_centers_set = set()
         mapping_dict = {}

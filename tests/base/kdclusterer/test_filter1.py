@@ -23,7 +23,8 @@ for e, img in enumerate(("simple.png",
 
 
     f = Frame2D.from_image(os.path.join(sys.path[0], "testimgs", img))
-    flat = f.data[...,0].reshape([-1, 1])
+    flat = f.normalize().data[..., 0].reshape([-1, 1])  # just the red channel for easier debugging
+    
     root = construct_kdtree(flat)
 
     k = 2
@@ -46,6 +47,7 @@ for e, img in enumerate(("simple.png",
     log.debug(f"root.left.left.assigned: {root.left.left.assigned}")
 
     all_assigned = [mapping_dict[cand] for cand in [n.assigned for n in root.cell]]
+    print(f"all assigned {all_assigned}")
     ax[0][e].imshow(255 - f.data[...,0])
     ax[0][e].axis('off')
     ax[1][e].imshow(np.asarray(all_assigned).reshape((f.width(), f.height())).transpose())

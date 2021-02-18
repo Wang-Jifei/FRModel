@@ -11,7 +11,7 @@ class TestD2(unittest.TestCase):
     @classmethod
     def setUp(cls) -> None:
         cls.frame = Frame2D.from_image(f"{_RSC}/imgs/chestnut_0/screenshot1.png")
-        cls.frame.data = cls.frame.data[...,:3] # TODO not sure why there is an extra column of 255 when a screenshot is taken?
+        cls.frame.data = cls.frame.data[...,:3] # REMOVE THIS if not a screenshot
         cls.frame_window = cls.frame.split_xy(100)[0][0]
         cls.window = 100
         cls._RSC = _RSC
